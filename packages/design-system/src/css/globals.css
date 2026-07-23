@@ -1,0 +1,47 @@
+@import "./tokens.css";
+:root {
+  --valenor-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  body {
+    @apply bg-bg text-fg font-body font-light antialiased transition-colors duration-300;
+  }
+
+  ::selection {
+    background: var(--color-accent);
+    color: var(--color-bg);
+  }
+
+  :focus-visible {
+    outline: var(--color-focus-ring) solid 1px;
+    outline-offset: 4px;
+  }
+}
+
+@layer utilities {
+  .label {
+    @apply font-body text-[11px] uppercase tracking-label text-fg-muted;
+  }
+}

@@ -1,0 +1,136 @@
+:root {
+  --color-bg: #121210;
+  --color-bg-raised: #1b1b17;
+  --color-fg: #eae4d6;
+  --color-fg-muted: #b9b3a3;
+  --color-fg-subtle: #6e6a5e;
+  --color-accent: #4f6b5c;
+  --color-accent-strong: #7fa08d;
+  --color-border: rgba(234, 228, 214, 0.12);
+  --color-focus-ring: #7fa08d;
+  --color-error: #8C3B3B;
+  --color-success: #2C4C3B;
+  --valenor-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+[data-theme="light"] {
+  --color-bg: #FAF9F6; /* Premium Architectural Beige */
+  --color-bg-raised: #F3F2EE; /* Secondary Layer Ivory */
+  --color-fg: #000000;
+  --color-fg-muted: #4a473d;
+  --color-fg-subtle: #6e6a5e;
+  --color-accent: #2f4a3d;
+  --color-accent-strong: #23392f;
+  --color-border: rgba(23, 23, 15, 0.14);
+  --color-focus-ring: #2f4a3d;
+  --color-error: #8C3B3B;
+  --color-success: #2C4C3B;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  body {
+    @apply bg-bg text-fg font-body font-light antialiased transition-colors duration-200;
+  }
+
+  /* Make sure background utility references follow theme switches perfectly */
+  .bg-bg { background-color: var(--color-bg) !important; }
+  .bg-bg-raised { background-color: var(--color-bg-raised) !important; }
+  .text-fg { color: var(--color-fg) !important; }
+  .text-fg-muted { color: var(--color-fg-muted) !important; }
+  .text-fg-subtle { color: var(--color-fg-subtle) !important; }
+  .border-theme { border-color: var(--color-border) !important; }
+
+  ::selection {
+    background: var(--color-accent);
+    color: var(--color-bg);
+  }
+
+  .has-custom-cursor,
+  .has-custom-cursor a,
+  .has-custom-cursor button {
+    cursor: none;
+  }
+
+  :focus-visible {
+    outline: var(--color-focus-ring) solid 1px;
+    outline-offset: 4px;
+  }
+}
+
+@layer utilities {
+  .label {
+    @apply font-body text-[11px] uppercase tracking-label text-fg-muted;
+  }
+}
+
+/* ==========================================================================
+   HIGH SPECIFICITY OVERRIDES FOR COMPONENT MARGINS & EXTENDED TABLES
+   ========================================================================== */
+[data-theme="light"] .light-theme-overrides,
+[data-theme="light"] main,
+[data-theme="light"] aside {
+  color: var(--color-fg) !important;
+}
+
+/* Force text visibility overrides */
+[data-theme="light"] .text-white,
+[data-theme="light"] .text-zinc-100,
+[data-theme="light"] .text-zinc-200,
+[data-theme="light"] .text-zinc-300,
+[data-theme="light"] .text-zinc-400 {
+  color: var(--color-fg) !important;
+}
+
+[data-theme="light"] .text-zinc-500,
+[data-theme="light"] .text-zinc-600,
+[data-theme="light"] [class*="text-zinc-"] {
+  color: var(--color-fg-muted) !important;
+}
+
+/* Force container backgrounds to adapt to the variable token states */
+[data-theme="light"] [class*="bg-[#050505]"],
+[data-theme="light"] [class*="bg-[#0a0a0a]"],
+[data-theme="light"] [class*="bg-[#0c0c0c]"],
+[data-theme="light"] [class*="bg-[#121212]"],
+[data-theme="light"] [class*="bg-[#161616]"],
+[data-theme="light"] .bg-zinc-950\/40,
+[data-theme="light"] td,
+[data-theme="light"] th {
+  background-color: var(--color-bg-raised) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-fg) !important;
+}
+
+/* Normalize Input text fields and dropdowns */
+[data-theme="light"] input,
+[data-theme="light"] textarea,
+[data-theme="light"] select {
+  background-color: var(--color-bg) !important;
+  border: 1px solid var(--color-border) !important;
+  color: var(--color-fg) !important;
+}
+
+[data-theme="light"] input::placeholder,
+[data-theme="light"] textarea::placeholder {
+  color: var(--color-fg-subtle) !important;
+}
+
+/* Adjust active tracking indicators */
+[data-theme="light"] aside [class*="bg-zinc-900"] {
+  background-color: var(--color-border) !important;
+  color: var(--color-fg) !important;
+}

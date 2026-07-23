@@ -1,0 +1,15 @@
+{
+  "name": "@valenor/domain",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Pure, framework-agnostic domain logic (architecture §4). No Next.js, no Prisma runtime — deliberately, so it can be tested and reasoned about in isolation, and reused by a future worker process without dragging in web-app concerns.",
+  "main": "src/index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.4"
+  }
+}
