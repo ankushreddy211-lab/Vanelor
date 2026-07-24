@@ -15,14 +15,14 @@ export function SignInForm({ redirectTo }: SignInFormProps) {
     <Tabs defaultValue="password" className="w-full max-w-sm">
       <TabsList>
         <TabsTrigger value="password">Email</TabsTrigger>
-        <TabsTrigger value="magic-link">Magic Link</TabsTrigger>
+        <TabsTrigger value="otp">Email Code</TabsTrigger>
       </TabsList>
 
       <TabsContent value="password">
         <PasswordForm redirectTo={redirectTo} />
       </TabsContent>
-      <TabsContent value="magic-link">
-        <MagicLinkForm redirectTo={redirectTo} />
+      <TabsContent value="otp">
+        <OTPForm redirectTo={redirectTo} />
       </TabsContent>
     </Tabs>
   );
@@ -111,46 +111,92 @@ function PasswordForm({ redirectTo }: SignInFormProps) {
 }
 
 /* ============================================================================
-   2. PASSWORDLESS MAGIC LINK STREAM
+   2. ONE-TIME PASSWORD (OTP) STREAM
    ============================================================================ */
-function MagicLinkForm({ redirectTo }: SignInFormProps) {
+function OTPForm({ redirectTo }: SignInFormProps) {
+  const router = useRouter();
   const [email, setEmail] = useState("");
+  const [code, setCode] = useState("");
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
-  async function handleSubmit(event: FormEvent) {
+  async function handleSendCode(event: FormEvent) {
     event.preventDefault();
     setPending(true);
     setError(null);
 
-    // FIXED: Points cleanly to /auth/callback to avoid Supabase 500 server rejection
     const { error: sendError } = await supabaseClient.auth.signInWithOtp({
-  email,
-  options: {
-    emailRedirectTo: `${window.location.origin}/callback`,
-  },
-});
+      email,
+      options: {
+        // Technically not needed for 6-digit OTP, but good fallback for the link
+        emailRedirectTo: `${window.location.origin}/callback`,
+      },
+    });
 
     setPending(false);
 
     if (sendError) {
-      setError(sendError.message ?? "Couldn't send the link.");
+      setError(sendError.message ?? "Couldn't send the code.");
       return;
     }
     setSent(true);
   }
 
+  async function handleVerifyCode(event: FormEvent) {
+    event.preventDefault();
+    setPending(true);
+    setError(null);
+
+    const { error: verifyError } = await supabaseClient.auth.verifyOtp({
+      email,
+      token: code,
+      type: 'email',
+    });
+
+    setPending(false);
+
+    if (verifyError) {
+      setError(verifyError.message ?? "Invalid or expired code.");
+      return;
+    }
+
+    router.push(redirectTo);
+    router.refresh();
+  }
+
   if (sent) {
     return (
-      <Text role="bodySm" as="p" className="mt-6 text-xs text-fg-muted italic">
-        Check your email inbox for your secure brand gateway link.
-      </Text>
+      <form onSubmit={handleVerifyCode} className="mt-6 flex flex-col gap-4 text-left">
+        <Text role="bodySm" as="p" className="text-xs text-fg-muted mb-2">
+          We sent a 6-digit code to <span className="text-fg font-medium">{email}</span>.
+        </Text>
+        <Input
+          type="text"
+          placeholder="6-Digit Code"
+          value={code}
+          onChange={(event) => setCode(event.target.value)}
+          autoComplete="one-time-code"
+          maxLength={6}
+          required
+        />
+        {error && <Text role="caption" as="p" className="text-accent-strong text-xs font-medium">{error}</Text>}
+        <Button type="submit" variant="primary" className="w-full mt-2" disabled={pending || code.length !== 6}>
+          {pending ? "Verifying..." : "Verify & Sign In"}
+        </Button>
+        <button
+          type="button"
+          onClick={() => { setSent(false); setCode(""); setError(null); }}
+          className="text-xs text-fg-subtle hover:text-fg transition-colors underline mt-2 text-center"
+        >
+          Use a different email
+        </button>
+      </form>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4 text-left">
+    <form onSubmit={handleSendCode} className="mt-6 flex flex-col gap-4 text-left">
       <Input
         type="email"
         placeholder="Email Address *"
@@ -161,7 +207,7 @@ function MagicLinkForm({ redirectTo }: SignInFormProps) {
       />
       {error && <Text role="caption" as="p" className="text-accent-strong text-xs font-medium">{error}</Text>}
       <Button type="submit" variant="primary" className="w-full mt-2" disabled={pending}>
-        {pending ? "Sending..." : "Send Magic Link"}
+        {pending ? "Sending Code..." : "Send Login Code"}
       </Button>
     </form>
   );
