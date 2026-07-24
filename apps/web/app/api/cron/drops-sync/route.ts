@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { env } from "../../../../lib/env";
 import { logger } from "../../../../lib/observability/logger";
-import { transitionDropStatuses } from "../../../../features/drops/server/sync";
+import { transitionDropStatuses } from "@/app/drops/server/sync";
 
 /**
  * Architecture §11.2: "Drop pages... switch to dynamic/live rendering at

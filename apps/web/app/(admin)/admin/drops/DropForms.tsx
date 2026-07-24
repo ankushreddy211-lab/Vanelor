@@ -2,7 +2,7 @@
 
 import { useState, useTransition, type FormEvent } from "react";
 import { Input, Button, Text } from "@valenor/design-system";
-import { createDrop, addPieceToDrop, deleteDrop } from "../../../../features/drops/server/actions";
+import { createDrop, addPieceToDrop, deleteDrop } from "@/app/drops/server/actions";
 import type { CollectionListItem } from "../../../../features/catalog/server/queries";
 
 export function DropForm({ collections }: { collections: CollectionListItem[] }) {

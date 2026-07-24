@@ -1,14 +1,32 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 
-const findManyMock = vi.fn();
-const deleteManyMock = vi.fn();
+const { findManyMock, deleteManyMock } = vi.hoisted(() => ({
+  findManyMock: vi.fn(),
+  deleteManyMock: vi.fn(),
+}));
 
 vi.mock("@valenor/db", () => ({
   prisma: {
-    userRole: { findMany: (...args: unknown[]) => findManyMock(...args) },
     session: { deleteMany: (...args: unknown[]) => deleteManyMock(...args) },
   },
 }));
+
+vi.mock("next/headers", () => ({
+  cookies: vi.fn(() => ({ getAll: vi.fn(() => []) })),
+}));
+
+vi.mock("@supabase/ssr", () => ({
+  createServerClient: () => ({
+    from: () => ({
+      select: () => ({
+        eq: async () => ({ data: await findManyMock(), error: null }),
+      }),
+    }),
+  }),
+}));
+
+process.env.NEXT_PUBLIC_SUPABASE_URL = "dummy";
+process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = "dummy";
 
 // Imported after the mock so the mocked module is what gets wired in.
 const { revokeAllSessionsForUser } = await import("../revocation");

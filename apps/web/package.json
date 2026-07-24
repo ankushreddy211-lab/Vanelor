@@ -13,16 +13,15 @@
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.2",
     "@upstash/redis": "^1.38.0",
-    "@valenor/contracts": "*",
-    "@valenor/db": "*",
-    "@valenor/design-system": "*",
-    "@valenor/domain": "*",
+    "@valenor/contracts": "workspace:*",
+    "@valenor/db": "workspace:*",
+    "@valenor/design-system": "workspace:*",
+    "@valenor/domain": "workspace:*",
     "better-auth": "^1.4.0",
     "framer-motion": "^11.11.17",
     "ioredis": "^5.4.1",
     "next": "^14.2.15",
     "next-auth": "^5.0.0-beta.31",
-    "@valenor/features": "*",
     "nodemailer": "^7.0.13",
     "pino": "^9.5.0",
     "posthog-js": "^1.404.1",
@@ -31,16 +30,16 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@types/node": "^22.9.0",
-    "@types/react": "^18.3.12",
+    "@types/node": "^20.17.6",
+    "@types/react": "^18.3.31",
     "@types/react-dom": "^18.3.1",
-    "@valenor/config": "*",
+    "@valenor/config": "workspace:*",
     "autoprefixer": "^10.4.20",
     "eslint": "^8.57.0",
     "eslint-config-next": "^14.2.15",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.15",
-    "typescript": "^5.6.3",
+    "typescript": "^5.8.2",
     "vitest": "^2.1.4"
   }
 }

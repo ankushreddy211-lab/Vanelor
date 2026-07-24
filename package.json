@@ -3,23 +3,20 @@
   "private": true,
   "version": "0.1.0",
   "description": "VALENOR — digital fashion house. Monorepo root. See docs/architecture.md.",
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
+  "packageManager": "pnpm@9.0.0",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
-    "dev": "npm run dev --workspace=apps/web",
-    "build": "npm run build --workspace=apps/web",
-    "typecheck": "npm run typecheck --workspaces --if-present",
-    "lint": "npm run lint --workspaces --if-present",
-    "test": "npm run test --workspaces --if-present",
+    "dev": "pnpm --filter @valenor/web dev",
+    "build": "pnpm --filter @valenor/web build",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "pnpm -r lint",
+    "test": "pnpm -r test",
     "db:generate": "npm run generate --workspace=@valenor/db",
     "db:migrate": "npm run migrate:dev --workspace=@valenor/db",
     "db:seed": "npm run seed --workspace=@valenor/db",
     "prepare": "husky"
-  },
-  "engines": {
-    "node": ">=20"
   },
   "lint-staged": {
     "*.{js,ts,tsx}": [
