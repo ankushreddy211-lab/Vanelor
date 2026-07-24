@@ -67,7 +67,7 @@ export function SignUpForm() {
     const { error: verifyError } = await supabaseClient.auth.verifyOtp({
       email,
       token: code,
-      type: 'signup',
+      type: 'email',
     });
 
     setPending(false);
