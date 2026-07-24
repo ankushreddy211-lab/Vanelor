@@ -57,5 +57,5 @@ export default async function ProductPage({ params }: { params: { id: string } }
     );
   }
 
-  return <ProductClientView product={product} isMember={isMember} />;
+  return <ProductClientView product={product} isMember={isMember} isAuthenticated={!!user} />;
 }

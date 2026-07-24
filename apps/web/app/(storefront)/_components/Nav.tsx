@@ -59,10 +59,10 @@ export function Nav({ isAdmin = false }: NavProps) {
           
           {/* Desktop Navigation Links */}
           <nav className="hidden gap-8 lg:gap-10 md:flex">
-            <Link href="/#chapters" className="label transition-colors hover:text-fg">The House</Link>
-            <Link href="/collections" className="label transition-colors hover:text-fg">Collections</Link>
-            <Link href="/journal" className="label transition-colors hover:text-fg">Journal</Link>
-            <Link href="/membership/acquire" className="label transition-colors hover:text-fg">Membership</Link>
+            <Link href="/#chapters" className={`label transition-colors ${pathname === "/" ? "text-accent-strong font-bold border-b border-accent-strong pb-1" : "text-fg-muted hover:text-fg"}`}>The House</Link>
+            <Link href="/collections" className={`label transition-colors ${pathname?.startsWith("/collections") ? "text-accent-strong font-bold border-b border-accent-strong pb-1" : "text-fg-muted hover:text-fg"}`}>Collections</Link>
+            <Link href="/journal" className={`label transition-colors ${pathname?.startsWith("/journal") ? "text-accent-strong font-bold border-b border-accent-strong pb-1" : "text-fg-muted hover:text-fg"}`}>Journal</Link>
+            <Link href="/membership/acquire" className={`label transition-colors ${pathname?.startsWith("/membership") ? "text-accent-strong font-bold border-b border-accent-strong pb-1" : "text-fg-muted hover:text-fg"}`}>Membership</Link>
           </nav>
           
           <div className="flex items-center gap-3 sm:gap-4">
@@ -111,16 +111,16 @@ export function Nav({ isAdmin = false }: NavProps) {
         </div>
 
         <nav className="flex flex-col space-y-6 text-center my-auto">
-          <Link href="/#chapters" className="font-display text-2xl tracking-wider text-fg hover:text-accent-strong transition-colors">
+          <Link href="/#chapters" className={`font-display text-2xl tracking-wider transition-colors ${pathname === "/" ? "text-accent-strong font-bold" : "text-fg hover:text-accent-strong"}`}>
             The House
           </Link>
-          <Link href="/collections" className="font-display text-2xl tracking-wider text-fg hover:text-accent-strong transition-colors">
+          <Link href="/collections" className={`font-display text-2xl tracking-wider transition-colors ${pathname?.startsWith("/collections") ? "text-accent-strong font-bold" : "text-fg hover:text-accent-strong"}`}>
             Collections
           </Link>
-          <Link href="/journal" className="font-display text-2xl tracking-wider text-fg hover:text-accent-strong transition-colors">
+          <Link href="/journal" className={`font-display text-2xl tracking-wider transition-colors ${pathname?.startsWith("/journal") ? "text-accent-strong font-bold" : "text-fg hover:text-accent-strong"}`}>
             Journal
           </Link>
-          <Link href="/membership/acquire" className="font-display text-2xl tracking-wider text-fg hover:text-accent-strong transition-colors">
+          <Link href="/membership/acquire" className={`font-display text-2xl tracking-wider transition-colors ${pathname?.startsWith("/membership") ? "text-accent-strong font-bold" : "text-fg hover:text-accent-strong"}`}>
             Membership
           </Link>
         </nav>

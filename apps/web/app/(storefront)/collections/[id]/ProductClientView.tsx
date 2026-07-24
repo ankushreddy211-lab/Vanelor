@@ -26,9 +26,10 @@ interface Product {
 interface ProductClientViewProps {
   product: Product;
   isMember?: boolean; // Pass true if user belongs to the House Registry
+  isAuthenticated?: boolean;
 }
 
-export default function ProductClientView({ product, isMember = false }: ProductClientViewProps) {
+export default function ProductClientView({ product, isMember = false, isAuthenticated = false }: ProductClientViewProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [selectedSize, setSelectedSize] = useState(
     Array.isArray(product.sizes) && product.sizes.length > 0 ? product.sizes[0] : "Standard / Custom Tailored"
@@ -298,12 +299,21 @@ export default function ProductClientView({ product, isMember = false }: Product
             )}
 
             <div className="pt-6 md:pt-8 border-t border-border/85 flex flex-col gap-3">
-              <Link 
-                href={`/waiting-list?product=${encodeURIComponent(product.title)}&size=${encodeURIComponent(selectedSize)}`}
-                className="w-full bg-fg text-bg py-4 text-center font-mono text-xs uppercase tracking-[0.25em] font-medium hover:bg-accent-strong transition-colors block"
-              >
-                Order Piece {selectedSize ? `(${selectedSize})` : ""}
-              </Link>
+              {isAuthenticated ? (
+                <Link 
+                  href={`/waiting-list?product=${encodeURIComponent(product.title)}&size=${encodeURIComponent(selectedSize)}`}
+                  className="w-full bg-fg text-bg py-4 text-center font-mono text-xs uppercase tracking-[0.25em] font-medium hover:bg-accent-strong transition-colors block"
+                >
+                  Order Piece {selectedSize ? `(${selectedSize})` : ""}
+                </Link>
+              ) : (
+                <Link 
+                  href={`/sign-in?from=/collections/${product.id}`}
+                  className="w-full bg-fg text-bg py-4 text-center font-mono text-xs uppercase tracking-[0.25em] font-medium hover:bg-accent-strong transition-colors block"
+                >
+                  Sign in to Order
+                </Link>
+              )}
               {!isMember && (
                 <Link 
                   href="/membership" 

@@ -1,4 +1,4 @@
-﻿"use server";
+"use server";
 
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
@@ -112,4 +112,24 @@ function getFallbackMatrix() {
     invitations: [],
     ledgerSummary: { volumeI: "Not Joined", volumeII: "Not Joined", volumeIII: "Not Joined", volumeIV: "Not Joined" }
   };
+}
+
+export async function adjustRegistryTier(registryId: string, nextTier: string) {
+  const cookieStore = await cookies();
+  const { getSession } = await import("@/lib/auth/session");
+  const { assertCanForUser } = await import("@/lib/auth/rbac");
+  
+  const session = await getSession();
+  if (!session) throw new Error("Unauthorized");
+
+  // Enforce server-side RBAC validation: only users with manage_roles or admin:access can do this
+  await assertCanForUser(session.userId, "admin:access");
+
+  const supabase = await getSupabaseServerClient();
+  const { error } = await supabase
+    .from("house_registry")
+    .update({ membership_tier: nextTier })
+    .eq("id", registryId);
+
+  if (error) throw error;
 }

@@ -37,8 +37,10 @@ export async function middleware(request: NextRequest) {
     }
   );
 
-  // 3. Optimistic UX Redirection for Administrative Subroutes
-  if (request.nextUrl.pathname.startsWith("/admin")) {
+  // 3. Optimistic UX Redirection for Protected Subroutes
+  const isProtected = request.nextUrl.pathname.startsWith("/admin") || request.nextUrl.pathname.startsWith("/waiting-list");
+  
+  if (isProtected) {
     // Check if a valid Supabase session token exists in the cookie jar
     const { data: { session } } = await supabase.auth.getSession();
 
@@ -55,5 +57,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*"],
+  matcher: ["/admin/:path*", "/waiting-list/:path*"],
 };

@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useTransition } from "react";
 import { supabaseClient } from "../../../../lib/auth/auth-client";
+import { adjustRegistryTier } from "../../../actions/registry";
 
 interface RegistryRecord {
   id: string;
@@ -17,6 +18,7 @@ interface RegistryRecord {
 export function RegistryLedger() {
   const [patrons, setPatrons] = useState<RegistryRecord[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isPending, startTransition] = useTransition();
 
   async function loadRegistry() {
     setLoading(true);
@@ -32,12 +34,18 @@ export function RegistryLedger() {
     loadRegistry();
   }, []);
 
-  const adjustTier = async (id: string, nextTier: string) => {
-    const { error } = await supabaseClient
-      .from("house_registry")
-      .update({ membership_tier: nextTier })
-      .eq("id", id);
-    if (!error) loadRegistry();
+  const adjustTier = (id: string, nextTier: string) => {
+    // Optimistic UI update
+    setPatrons(prev => prev.map(p => p.id === id ? { ...p, membership_tier: nextTier } : p));
+    
+    startTransition(async () => {
+      try {
+        await adjustRegistryTier(id, nextTier);
+      } catch (error) {
+        console.error("Failed to adjust tier", error);
+        loadRegistry(); // Revert on failure
+      }
+    });
   };
 
   if (loading) {
@@ -110,9 +118,10 @@ export function RegistryLedger() {
                     </td>
                     <td className="p-4 text-right">
                       <select
+                        disabled={isPending}
                         value={patron.membership_tier}
                         onChange={(e) => adjustTier(patron.id, e.target.value)}
-                        className="bg-bg border border-theme text-[10px] font-mono p-1.5 text-fg focus:outline-none focus:border-fg cursor-pointer uppercase tracking-wider rounded-none"
+                        className="bg-bg border border-theme text-[10px] font-mono p-1.5 text-fg focus:outline-none focus:border-fg cursor-pointer uppercase tracking-wider rounded-none disabled:opacity-50"
                       >
                         <option value="guest">Guest</option>
                         <option value="registry">Registry</option>
@@ -166,9 +175,10 @@ export function RegistryLedger() {
               <div className="pt-2 border-t border-theme/35 flex items-center justify-between gap-3">
                 <span className="text-[10px] font-mono text-fg-muted uppercase">Modify Tier:</span>
                 <select
+                  disabled={isPending}
                   value={patron.membership_tier}
                   onChange={(e) => adjustTier(patron.id, e.target.value)}
-                  className="bg-bg border border-theme text-[10px] font-mono p-1.5 text-fg focus:outline-none focus:border-fg cursor-pointer uppercase tracking-wider rounded-none flex-1"
+                  className="bg-bg border border-theme text-[10px] font-mono p-1.5 text-fg focus:outline-none focus:border-fg cursor-pointer uppercase tracking-wider rounded-none flex-1 disabled:opacity-50"
                 >
                   <option value="guest">Guest</option>
                   <option value="registry">Registry</option>

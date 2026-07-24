@@ -2,6 +2,7 @@ import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import AdminClientLayout from './AdminClientLayout';
+import { assertCanForUser } from '../../lib/auth/rbac';
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const cookieStore = await cookies();
@@ -34,15 +35,10 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     redirect('/login');
   }
 
-  // 2. Fetch their actual role directly from your PostgreSQL "User" table
-  const { data: dbUser, error: dbError } = await supabase
-    .from('User')
-    .select('role')
-    .eq('id', user.id)
-    .single();
-
-  // 3. Absolute server-side block for any non-admin trying to access /admin/*
-  if (dbError || !dbUser || dbUser.role?.toLowerCase() !== 'admin') {
+  // 2. Validate admin privileges using the centralized RBAC system
+  try {
+    await assertCanForUser(user.id, "admin:access");
+  } catch {
     redirect('/'); // Kick regular users back to the storefront immediately
   }
 
