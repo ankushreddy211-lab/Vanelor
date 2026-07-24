@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { useRouter } from "next/navigation";
 import { Text, Input, Button } from "@valenor/design-system";
 import { supabaseClient } from "../../../lib/auth/auth-client"; 
 
@@ -14,6 +15,8 @@ export function SignUpForm() {
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false); // Tracks confirmation state
+  const [code, setCode] = useState("");
+  const router = useRouter();
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
@@ -56,20 +59,71 @@ export function SignUpForm() {
     setIsSubmitted(true);
   }
 
-  // If successfully registered, show the email confirmation instruction screen
+  async function handleVerifyCode(event: FormEvent) {
+    event.preventDefault();
+    setPending(true);
+    setError(null);
+
+    const { error: verifyError } = await supabaseClient.auth.verifyOtp({
+      email,
+      token: code,
+      type: 'signup',
+    });
+
+    setPending(false);
+
+    if (verifyError) {
+      setError(verifyError.message ?? "Invalid or expired code.");
+      return;
+    }
+
+    // Success! 
+    router.push("/dashboard");
+    router.refresh();
+  }
+
+  // If successfully registered, show the OTP verification screen
   if (isSubmitted) {
     return (
-      <div className="mt-6 flex flex-col items-center text-center animate-fade-in w-full max-w-md mx-auto px-4">
+      <form onSubmit={handleVerifyCode} className="mt-6 flex flex-col items-center text-center animate-fade-in w-full max-w-md mx-auto px-4">
         <span className="text-[10px] font-mono uppercase tracking-[0.3em] text-accent-strong block mb-2">
           Protocol Verification
         </span>
         <Text role="heading" as="h2" className="text-2xl font-light uppercase tracking-tight text-fg">
-          Check your inbox
+          Verify your email
         </Text>
-        <p className="mt-3 text-xs sm:text-sm text-fg-muted font-sans leading-relaxed">
-          We have sent a confirmation link to <span className="font-medium text-fg">{email}</span>. Please click the link inside to verify your account and access VALENOR.
+        <p className="mt-3 mb-6 text-xs sm:text-sm text-fg-muted font-sans leading-relaxed">
+          We have sent a 6-digit code to <span className="font-medium text-fg">{email}</span>. Please enter it below to secure your account.
         </p>
-      </div>
+
+        <div className="w-full flex flex-col gap-4 text-left">
+          <Input
+            type="text"
+            placeholder="6-Digit Code"
+            value={code}
+            onChange={(event) => setCode(event.target.value)}
+            autoComplete="one-time-code"
+            maxLength={6}
+            required
+            className="text-center tracking-widest font-mono text-lg"
+          />
+          {error && (
+            <Text role="caption" as="p" className="text-amber-500 text-xs font-mono bg-amber-500/10 border border-amber-500/20 p-2.5 text-left">
+              {error}
+            </Text>
+          )}
+          <Button type="submit" variant="primary" className="w-full mt-2 cursor-pointer font-mono text-xs uppercase tracking-[0.2em]" disabled={pending || code.length !== 6}>
+            {pending ? "Verifying..." : "Verify Code →"}
+          </Button>
+          <button
+            type="button"
+            onClick={() => { setIsSubmitted(false); setCode(""); setError(null); }}
+            className="text-xs text-fg-subtle hover:text-fg transition-colors underline mt-2 text-center"
+          >
+            Go Back
+          </button>
+        </div>
+      </form>
     );
   }
 
